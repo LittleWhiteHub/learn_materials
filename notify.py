@@ -29,7 +29,7 @@ def print(text, *args, **kw):
 # 通知服务
 # fmt: off
 push_config = {
-    'HITOKOTO': False,  # 启用一言（随机句子）
+    'HITOKOTO': True,  # 启用一言（随机句子）
 
     'BARK_PUSH': '',  # bark IP 或设备码，例：https://api.day.app/DxHcxxxxxRxxxxxxcm/
     'BARK_ARCHIVE': '',  # bark 推送是否存档
@@ -37,7 +37,7 @@ push_config = {
     'BARK_SOUND': '',  # bark 推送声音
     'BARK_ICON': '',  # bark 推送图标
 
-    'CONSOLE': True,  # 控制台输出
+    'CONSOLE': False,  # 控制台输出
 
     'DD_BOT_SECRET': '',  # 钉钉机器人的 DD_BOT_SECRET
     'DD_BOT_TOKEN': '',  # 钉钉机器人的 DD_BOT_TOKEN
@@ -61,6 +61,10 @@ push_config = {
     'PUSH_KEY': '',  # server 酱的 PUSH_KEY，兼容旧版与 Turbo 版
 
     'DEER_KEY': '',  # PushDeer 的 PUSHDEER_KEY
+    'DEER_URL': '',  # PushDeer 的 PUSHDEER_URL
+
+    'CHAT_URL': '',  # synology chat url
+    'CHAT_TOKEN': '',  # synology chat token
 
     'PUSH_PLUS_TOKEN': '',  # push+ 微信推送的用户令牌
     'PUSH_PLUS_USER': '',  # push+ 微信推送的群组编码
@@ -78,6 +82,10 @@ push_config = {
     'TG_PROXY_AUTH': '',  # tg 代理认证参数
     'TG_PROXY_HOST': '',  # tg 机器人的 TG_PROXY_HOST
     'TG_PROXY_PORT': '',  # tg 机器人的 TG_PROXY_PORT
+
+    'AIBOTK_KEY': '',  # 智能微秘书 个人中心的apikey 文档地址：http://wechat.aibotk.com/docs/about
+    'AIBOTK_TYPE': '',  # 智能微秘书 发送目标 room 或 contact
+    'AIBOTK_NAME': '',  # 智能微秘书  发送群名 或者好友昵称和type要对应好
 }
 notify_function = []
 # fmt: on
@@ -96,7 +104,7 @@ def bark(title: str, content: str) -> None:
     if not push_config.get("BARK_PUSH"):
         print("bark 服务的 BARK_PUSH 未设置!!\n取消推送")
         return
-    # print("bark 服务启动")
+    print("bark 服务启动")
 
     if push_config.get("BARK_PUSH").startswith("http"):
         url = f'{push_config.get("BARK_PUSH")}/{urllib.parse.quote_plus(title)}/{urllib.parse.quote_plus(content)}'
@@ -132,7 +140,7 @@ def console(title: str, content: str) -> None:
     """
     使用 控制台 推送消息。
     """
-    # print(f"{title}\n\n{content}")
+    print(f"{title}\n\n{content}")
 
 
 def dingding_bot(title: str, content: str) -> None:
@@ -142,7 +150,7 @@ def dingding_bot(title: str, content: str) -> None:
     if not push_config.get("DD_BOT_SECRET") or not push_config.get("DD_BOT_TOKEN"):
         print("钉钉机器人 服务的 DD_BOT_SECRET 或者 DD_BOT_TOKEN 未设置!!\n取消推送")
         return
-    # print("钉钉机器人 服务启动")
+    print("钉钉机器人 服务启动")
 
     timestamp = str(round(time.time() * 1000))
     secret_enc = push_config.get("DD_BOT_SECRET").encode("utf-8")
@@ -172,7 +180,7 @@ def feishu_bot(title: str, content: str) -> None:
     if not push_config.get("FSKEY"):
         print("飞书 服务的 FSKEY 未设置!!\n取消推送")
         return
-    # print("飞书 服务启动")
+    print("飞书 服务启动")
 
     url = f'https://open.feishu.cn/open-apis/bot/v2/hook/{push_config.get("FSKEY")}'
     data = {"msg_type": "text", "content": {"text": f"{title}\n\n{content}"}}
@@ -191,9 +199,9 @@ def go_cqhttp(title: str, content: str) -> None:
     if not push_config.get("GOBOT_URL") or not push_config.get("GOBOT_QQ"):
         print("go-cqhttp 服务的 GOBOT_URL 或 GOBOT_QQ 未设置!!\n取消推送")
         return
-    # print("go-cqhttp 服务启动")
+    print("go-cqhttp 服务启动")
 
-    url = f'{push_config.get("GOBOT_URL")}?access_token={push_config.get("GOBOT_TOKEN")}&{push_config.get("GOBOT_QQ")}&message={title}\n{content}'
+    url = f'{push_config.get("GOBOT_URL")}?access_token={push_config.get("GOBOT_TOKEN")}&{push_config.get("GOBOT_QQ")}&message=标题:{title}\n内容:{content}'
     response = requests.get(url).json()
 
     if response["status"] == "ok":
@@ -209,7 +217,7 @@ def gotify(title: str, content: str) -> None:
     if not push_config.get("GOTIFY_URL") or not push_config.get("GOTIFY_TOKEN"):
         print("gotify 服务的 GOTIFY_URL 或 GOTIFY_TOKEN 未设置!!\n取消推送")
         return
-    # print("gotify 服务启动")
+    print("gotify 服务启动")
 
     url = f'{push_config.get("GOTIFY_URL")}/message?token={push_config.get("GOTIFY_TOKEN")}'
     data = {"title": title, "message": content, "priority": push_config.get("GOTIFY_PRIORITY")}
@@ -228,7 +236,7 @@ def iGot(title: str, content: str) -> None:
     if not push_config.get("IGOT_PUSH_KEY"):
         print("iGot 服务的 IGOT_PUSH_KEY 未设置!!\n取消推送")
         return
-    # print("iGot 服务启动")
+    print("iGot 服务启动")
 
     url = f'https://push.hellyw.com/{push_config.get("IGOT_PUSH_KEY")}'
     data = {"title": title, "content": content}
@@ -248,7 +256,7 @@ def serverJ(title: str, content: str) -> None:
     if not push_config.get("PUSH_KEY"):
         print("serverJ 服务的 PUSH_KEY 未设置!!\n取消推送")
         return
-    # print("serverJ 服务启动")
+    print("serverJ 服务启动")
 
     data = {"text": title, "desp": content.replace("\n", "\n\n")}
     if push_config.get("PUSH_KEY").index("SCT") != -1:
@@ -270,15 +278,36 @@ def pushdeer(title: str, content: str) -> None:
     if not push_config.get("DEER_KEY"):
         print("PushDeer 服务的 DEER_KEY 未设置!!\n取消推送")
         return
-    # print("PushDeer 服务启动")
+    print("PushDeer 服务启动")
     data = {"text": title, "desp": content, "type": "markdown", "pushkey": push_config.get("DEER_KEY")}
     url = 'https://api2.pushdeer.com/message/push'
+    if push_config.get("DEER_URL"):
+        url = push_config.get("DEER_URL")
+
     response = requests.post(url, data=data).json()
 
     if len(response.get("content").get("result")) > 0:
         print("PushDeer 推送成功！")
     else:
         print("PushDeer 推送失败！错误信息：", response)
+
+
+def chat(title: str, content: str) -> None:
+    """
+    通过Chat 推送消息
+    """
+    if not push_config.get("CHAT_URL") or not push_config.get("CHAT_TOKEN"):
+        print("chat 服务的 CHAT_URL或CHAT_TOKEN 未设置!!\n取消推送")
+        return
+    print("chat 服务启动")
+    data = 'payload=' + json.dumps({'text': title + '\n' + content})
+    url = push_config.get("CHAT_URL") + push_config.get("CHAT_TOKEN")
+    response = requests.post(url, data=data)
+
+    if response.status_code == 200:
+        print("Chat 推送成功！")
+    else:
+        print("Chat 推送失败！错误信息：", response)
 
 
 def pushplus_bot(title: str, content: str) -> None:
@@ -288,7 +317,7 @@ def pushplus_bot(title: str, content: str) -> None:
     if not push_config.get("PUSH_PLUS_TOKEN"):
         print("PUSHPLUS 服务的 PUSH_PLUS_TOKEN 未设置!!\n取消推送")
         return
-    # print("PUSHPLUS 服务启动")
+    print("PUSHPLUS 服务启动")
 
     url = "http://www.pushplus.plus/send"
     data = {
@@ -324,7 +353,7 @@ def qmsg_bot(title: str, content: str) -> None:
     if not push_config.get("QMSG_KEY") or not push_config.get("QMSG_TYPE"):
         print("qmsg 的 QMSG_KEY 或者 QMSG_TYPE 未设置!!\n取消推送")
         return
-    # print("qmsg 服务启动")
+    print("qmsg 服务启动")
 
     url = f'https://qmsg.zendee.cn/{push_config.get("QMSG_TYPE")}/{push_config.get("QMSG_KEY")}'
     payload = {"msg": f'{title}\n\n{content.replace("----", "-")}'.encode("utf-8")}
@@ -347,7 +376,7 @@ def wecom_app(title: str, content: str) -> None:
     if 4 < len(QYWX_AM_AY) > 5:
         print("QYWX_AM 设置错误!!\n取消推送")
         return
-    # print("企业微信 APP 服务启动")
+    print("企业微信 APP 服务启动")
 
     corpid = QYWX_AM_AY[0]
     corpsecret = QYWX_AM_AY[1]
@@ -439,7 +468,7 @@ def wecom_bot(title: str, content: str) -> None:
     if not push_config.get("QYWX_KEY"):
         print("企业微信机器人 服务的 QYWX_KEY 未设置!!\n取消推送")
         return
-    # print("企业微信机器人服务启动")
+    print("企业微信机器人服务启动")
 
     url = f"https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key={push_config.get('QYWX_KEY')}"
     headers = {"Content-Type": "application/json;charset=utf-8"}
@@ -461,7 +490,7 @@ def telegram_bot(title: str, content: str) -> None:
     if not push_config.get("TG_BOT_TOKEN") or not push_config.get("TG_USER_ID"):
         print("tg 服务的 bot_token 或者 user_id 未设置!!\n取消推送")
         return
-    # print("tg 服务启动")
+    print("tg 服务启动")
 
     if push_config.get("TG_API_HOST"):
         url = f"https://{push_config.get('TG_API_HOST')}/bot{push_config.get('TG_BOT_TOKEN')}/sendMessage"
@@ -499,6 +528,39 @@ def telegram_bot(title: str, content: str) -> None:
         print("tg 推送失败！")
 
 
+def aibotk(title: str, content: str) -> None:
+    """
+    使用 智能微秘书 推送消息。
+    """
+    if not push_config.get("AIBOTK_KEY") or not push_config.get("AIBOTK_TYPE") or not push_config.get("AIBOTK_NAME"):
+        print("智能微秘书 的 AIBOTK_KEY 或者 AIBOTK_TYPE 或者 AIBOTK_NAME 未设置!!\n取消推送")
+        return
+    print("智能微秘书 服务启动")
+
+    if push_config.get("AIBOTK_TYPE") == 'room':
+        url = "https://api-bot.aibotk.com/openapi/v1/chat/room"
+        data = {
+            "apiKey": push_config.get("AIBOTK_KEY"),
+            "roomName": push_config.get("AIBOTK_NAME"),
+            "message": {"type": 1, "content": f'【青龙快讯】\n\n${title}\n${content}'}
+        }
+    else:
+        url = "https://api-bot.aibotk.com/openapi/v1/chat/contact"
+        data = {
+            "apiKey": push_config.get("AIBOTK_KEY"),
+            "name": push_config.get("AIBOTK_NAME"),
+            "message": {"type": 1, "content": f'【青龙快讯】\n\n${title}\n${content}'}
+        }
+    body = json.dumps(data).encode(encoding="utf-8")
+    headers = {"Content-Type": "application/json"}
+    response = requests.post(url=url, data=body, headers=headers).json()
+    print(response)
+    if response["code"] == 0:
+        print("智能微秘书 推送成功！")
+    else:
+        print(f'智能微秘书 推送失败！{response["error"]}')
+
+
 def one() -> str:
     """
     获取一条一言。
@@ -527,6 +589,8 @@ if push_config.get("PUSH_KEY"):
     notify_function.append(serverJ)
 if push_config.get("DEER_KEY"):
     notify_function.append(pushdeer)
+if push_config.get("CHAT_URL") and push_config.get("CHAT_TOKEN"):
+    notify_function.append(chat)
 if push_config.get("PUSH_PLUS_TOKEN"):
     notify_function.append(pushplus_bot)
 if push_config.get("QMSG_KEY") and push_config.get("QMSG_TYPE"):
@@ -537,6 +601,8 @@ if push_config.get("QYWX_KEY"):
     notify_function.append(wecom_bot)
 if push_config.get("TG_BOT_TOKEN") and push_config.get("TG_USER_ID"):
     notify_function.append(telegram_bot)
+if push_config.get("AIBOTK_KEY") and push_config.get("AIBOTK_TYPE") and push_config.get("AIBOTK_NAME"):
+    notify_function.append(aibotk)
 
 
 def send(title: str, content: str) -> None:
@@ -547,7 +613,7 @@ def send(title: str, content: str) -> None:
     hitokoto = push_config.get("HITOKOTO")
 
     text = one() if hitokoto else ""
-    content += "大自然的搬运工\nhttp://www.bedee.top/" + text
+    content += "\n\n" + text
 
     ts = [
         threading.Thread(target=mode, args=(title, content), name=mode.__name__)
