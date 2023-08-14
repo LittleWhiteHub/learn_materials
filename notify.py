@@ -606,6 +606,8 @@ if push_config.get("AIBOTK_KEY") and push_config.get("AIBOTK_TYPE") and push_con
 
 
 def send(title: str, content: str) -> None:
+    print(content)
+    print(title)
     if not content:
         print(f"{title} 推送内容为空！")
         return
